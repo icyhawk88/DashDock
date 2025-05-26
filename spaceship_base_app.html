@@ -320,15 +320,15 @@
         <nav class="panel nav-left">
             <div class="control-panel">
                 <div class="control-title">Navigation</div>
-                <div class="control-button" onclick="loadModule('dashboard')">Dashboard</div>
-                <div class="control-button" onclick="loadModule('modules')">Module Bay</div>
-                <div class="control-button" onclick="loadModule('settings')">Ship Config</div>
+                <button class="control-button" onclick="loadModule('dashboard')">Dashboard</button>
+                <button class="control-button" onclick="loadModule('modules')">Module Bay</button>
+                <button class="control-button" onclick="loadModule('settings')">Ship Config</button>
             </div>
             
             <div class="control-panel">
                 <div class="control-title">Systems</div>
-                <div class="control-button" onclick="systemAction('scan')">Sensor Sweep</div>
-                <div class="control-button" onclick="systemAction('diagnostic')">Diagnostics</div>
+                <button class="control-button" onclick="systemAction('scan')">Sensor Sweep</button>
+                <button class="control-button" onclick="systemAction('diagnostic')">Diagnostics</button>
             </div>
         </nav>
 
@@ -347,10 +347,10 @@
         <nav class="panel nav-right">
             <div class="control-panel">
                 <div class="control-title">Quick Deploy</div>
-                <div class="control-button" onclick="quickDeploy('environmental')">🌊 Creek Intel</div>
-                <div class="control-button" onclick="quickDeploy('calculator')">Calculator</div>
-                <div class="control-button" onclick="quickDeploy('notepad')">Notepad</div>
-                <div class="control-button" onclick="quickDeploy('timer')">Timer</div>
+                <button class="control-button" onclick="quickDeploy('environmental')">🌊 Creek Intel</button>
+                <button class="control-button" onclick="quickDeploy('calculator')">Calculator</button>
+                <button class="control-button" onclick="quickDeploy('notepad')">Notepad</button>
+                <button class="control-button" onclick="quickDeploy('timer')">Timer</button>
             </div>
             
             <div class="control-panel">
@@ -385,19 +385,26 @@
             }
         }
 
-        // Fixed quickDeploy function
-        function quickDeploy(moduleType) {
+        // Global function - Fixed quickDeploy function
+        window.quickDeploy = function(moduleType) {
+            console.log('quickDeploy called with:', moduleType); // Debug log
             if (moduleType === 'environmental') {
                 loadEnvironmentalModule();
             } else {
                 loadModule(moduleType);
             }
-        }
+        };
 
         // Module loading simulation
         function loadModule(moduleType) {
+            console.log('loadModule called with:', moduleType); // Debug log
             const moduleBay = document.querySelector('.module-bay');
             const loading = document.getElementById('loading');
+            
+            if (!moduleBay || !loading) {
+                console.error('Required elements not found');
+                return;
+            }
             
             moduleBay.style.display = 'none';
             loading.style.display = 'block';
@@ -584,6 +591,7 @@
         let calcWaitingForOperand = false;
 
         function calcInput(input) {
+            console.log('calcInput called with:', input); // Debug log
             const display = document.getElementById('calc-display');
             if (!display) return;
             
@@ -627,6 +635,9 @@
             display.textContent = calcDisplay;
         }
 
+        // Make calculator functions globally accessible
+        window.calcInput = calcInput;
+
         function calculate(first, second, operator) {
             switch (operator) {
                 case '+': return first + second;
@@ -643,6 +654,7 @@
         let timerRunning = false;
 
         function startTimer() {
+            console.log('startTimer called'); // Debug log
             if (!timerRunning) {
                 timerRunning = true;
                 timerInterval = setInterval(() => {
@@ -653,6 +665,7 @@
         }
 
         function pauseTimer() {
+            console.log('pauseTimer called'); // Debug log
             timerRunning = false;
             if (timerInterval) {
                 clearInterval(timerInterval);
@@ -661,6 +674,7 @@
         }
 
         function resetTimer() {
+            console.log('resetTimer called'); // Debug log
             pauseTimer();
             timerSeconds = 0;
             updateTimerDisplay();
@@ -678,18 +692,30 @@
 
         // Notepad functionality
         function clearNotes() {
+            console.log('clearNotes called'); // Debug log
             const notepad = document.getElementById('notepad-text');
             if (notepad) {
                 notepad.value = '';
             }
         }
 
+        // Make timer and notepad functions globally accessible
+        window.startTimer = startTimer;
+        window.pauseTimer = pauseTimer;
+        window.resetTimer = resetTimer;
+        window.clearNotes = clearNotes;
+
         function systemAction(action) {
+            console.log('systemAction called with:', action); // Debug log
             updateFooter(`Executing ${action}...`);
             setTimeout(() => {
                 updateFooter(`${action} complete - All systems nominal`);
             }, 1500);
         }
+
+        // Make functions globally accessible
+        window.systemAction = systemAction;
+        window.loadModule = loadModule;
 
         function updateFooter(message) {
             document.querySelector('.footer').textContent = message;
