@@ -64,22 +64,37 @@
         <div class="spinner"></div>
     </div>
     
-    <iframe id="spaceshipFrame" src="spaceship_base_app.html" onload="frameLoaded()"></iframe>
+    <!-- Create spaceship base directly instead of iframe -->
+    <div id="spaceshipApp" style="display: none;"></div>
     
     <script>
-        function frameLoaded() {
-            // Add a small delay for smooth transition
-            setTimeout(() => {
-                document.body.classList.add('loaded');
-            }, 500);
-        }
-        
-        // Fallback in case onload doesn't fire
+        // Load the spaceship app directly
         setTimeout(() => {
-            if (!document.body.classList.contains('loaded')) {
-                document.body.classList.add('loaded');
-            }
-        }, 3000);
+            document.getElementById('spaceshipApp').innerHTML = `
+                <!DOCTYPE html>
+                <html lang="en">
+                <head>
+                    <meta charset="UTF-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Command Interface - USS Modular</title>
+                </head>
+                <body>
+                    <!-- Spaceship content will be loaded here -->
+                </body>
+                </html>
+            `;
+            
+            // Show the loaded app
+            document.body.classList.add('loaded');
+            
+            // Load the main spaceship interface
+            loadSpaceshipInterface();
+        }, 1000);
+        
+        function loadSpaceshipInterface() {
+            // This will load the main spaceship interface
+            window.location.href = 'spaceship_base_app.html';
+        }
     </script>
 </body>
 </html>
