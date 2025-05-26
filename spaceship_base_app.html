@@ -394,20 +394,195 @@
             
             setTimeout(() => {
                 loading.style.display = 'none';
-                moduleBay.style.display = 'flex';
-                moduleBay.innerHTML = `
-                    <div class="bay-icon">⚡</div>
-                    <div class="bay-text">Module "${moduleType}" Ready</div>
-                `;
-                updateFooter(`Module "${moduleType}" successfully deployed`);
+                
+                if (moduleType === 'calculator') {
+                    loadCalculatorModule();
+                } else if (moduleType === 'notepad') {
+                    loadNotepadModule();
+                } else if (moduleType === 'timer') {
+                    loadTimerModule();
+                } else {
+                    // Generic module loading
+                    moduleBay.innerHTML = `
+                        <div class="bay-icon">⚡</div>
+                        <div class="bay-text">Module "${moduleType}" Ready</div>
+                    `;
+                    moduleBay.style.display = 'flex';
+                    updateFooter(`Module "${moduleType}" successfully deployed`);
+                }
             }, 2000);
         }
 
-        function quickDeploy(module) {
-            if (module === 'environmental') {
-                loadEnvironmentalModule();
-            } else {
-                loadModule(module);
+        function loadCalculatorModule() {
+            const moduleBay = document.querySelector('.module-bay');
+            moduleBay.innerHTML = `
+                <div style="width: 100%; max-width: 400px; background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                        <span style="font-size: 1.5em; margin-right: 10px; color: #00c8ff;">🔢</span>
+                        <span style="font-size: 1.2em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Calculator</span>
+                    </div>
+                    <div style="background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 5px; margin-bottom: 15px; text-align: right; font-size: 2em; color: #00ff88; min-height: 60px; display: flex; align-items: center; justify-content: flex-end;" id="calc-display">0</div>
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                        ${['C', '±', '%', '÷', '7', '8', '9', '×', '4', '5', '6', '-', '1', '2', '3', '+', '0', '.', '='].map(btn => 
+                            `<button style="padding: 15px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: all 0.2s ease;" 
+                            onmouseover="this.style.background='linear-gradient(145deg, rgba(0, 60, 120, 0.9), rgba(0, 30, 60, 1))'" 
+                            onmouseout="this.style.background='linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9))'"
+                            onclick="calcInput('${btn}')">${btn === '0' ? '<span style=\\"grid-column: span 2;\\">' + btn + '</span>' : btn}</button>`
+                        ).join('')}
+                    </div>
+                </div>
+            `;
+            moduleBay.style.display = 'flex';
+            moduleBay.style.height = 'auto';
+            updateFooter('Calculator Module deployed - Computational systems online');
+        }
+
+        function loadNotepadModule() {
+            const moduleBay = document.querySelector('.module-bay');
+            moduleBay.innerHTML = `
+                <div style="width: 100%; max-width: 600px; background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                        <div style="display: flex; align-items: center;">
+                            <span style="font-size: 1.5em; margin-right: 10px; color: #00c8ff;">📝</span>
+                            <span style="font-size: 1.2em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Notepad</span>
+                        </div>
+                        <button onclick="clearNotes()" style="padding: 5px 10px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 3px; font-size: 0.8em; cursor: pointer;">Clear</button>
+                    </div>
+                    <textarea id="notepad-text" style="width: 100%; height: 300px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 5px; padding: 15px; color: #e0f6ff; font-family: 'Courier New', monospace; font-size: 14px; resize: vertical;" placeholder="Enter mission notes..."></textarea>
+                    <div style="margin-top: 10px; font-size: 0.8em; opacity: 0.6; text-align: right;">Auto-saved locally</div>
+                </div>
+            `;
+            moduleBay.style.display = 'flex';
+            moduleBay.style.height = 'auto';
+            updateFooter('Notepad Module deployed - Data logging systems online');
+        }
+
+        function loadTimerModule() {
+            const moduleBay = document.querySelector('.module-bay');
+            moduleBay.innerHTML = `
+                <div style="width: 100%; max-width: 400px; background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                        <span style="font-size: 1.5em; margin-right: 10px; color: #00c8ff;">⏱️</span>
+                        <span style="font-size: 1.2em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Mission Timer</span>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 3em; font-weight: bold; color: #00ff88; margin-bottom: 10px;" id="timer-display">00:00:00</div>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button onclick="startTimer()" style="padding: 10px 20px; background: linear-gradient(145deg, rgba(0, 100, 0, 0.8), rgba(0, 60, 0, 0.9)); border: 1px solid rgba(0, 200, 0, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer;">Start</button>
+                            <button onclick="pauseTimer()" style="padding: 10px 20px; background: linear-gradient(145deg, rgba(100, 100, 0, 0.8), rgba(60, 60, 0, 0.9)); border: 1px solid rgba(200, 200, 0, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer;">Pause</button>
+                            <button onclick="resetTimer()" style="padding: 10px 20px; background: linear-gradient(145deg, rgba(100, 0, 0, 0.8), rgba(60, 0, 0, 0.9)); border: 1px solid rgba(200, 0, 0, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer;">Reset</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            moduleBay.style.display = 'flex';
+            moduleBay.style.height = 'auto';
+            updateFooter('Timer Module deployed - Chronometer systems online');
+        }
+
+        // Calculator functionality
+        let calcDisplay = '0';
+        let calcPrevious = null;
+        let calcOperator = null;
+        let calcWaitingForOperand = false;
+
+        function calcInput(input) {
+            const display = document.getElementById('calc-display');
+            
+            if (input === 'C') {
+                calcDisplay = '0';
+                calcPrevious = null;
+                calcOperator = null;
+                calcWaitingForOperand = false;
+            } else if (input === '=') {
+                if (calcPrevious !== null && calcOperator && !calcWaitingForOperand) {
+                    calcDisplay = String(calculate(calcPrevious, parseFloat(calcDisplay), calcOperator));
+                    calcPrevious = null;
+                    calcOperator = null;
+                    calcWaitingForOperand = true;
+                }
+            } else if (['+', '-', '×', '÷'].includes(input)) {
+                if (calcPrevious === null) {
+                    calcPrevious = parseFloat(calcDisplay);
+                } else if (calcOperator && !calcWaitingForOperand) {
+                    calcDisplay = String(calculate(calcPrevious, parseFloat(calcDisplay), calcOperator));
+                    calcPrevious = parseFloat(calcDisplay);
+                }
+                calcOperator = input;
+                calcWaitingForOperand = true;
+            } else if (input === '.') {
+                if (calcWaitingForOperand) {
+                    calcDisplay = '0.';
+                    calcWaitingForOperand = false;
+                } else if (calcDisplay.indexOf('.') === -1) {
+                    calcDisplay += '.';
+                }
+            } else if (input >= '0' && input <= '9') {
+                if (calcWaitingForOperand) {
+                    calcDisplay = input;
+                    calcWaitingForOperand = false;
+                } else {
+                    calcDisplay = calcDisplay === '0' ? input : calcDisplay + input;
+                }
+            }
+            
+            display.textContent = calcDisplay;
+        }
+
+        function calculate(first, second, operator) {
+            switch (operator) {
+                case '+': return first + second;
+                case '-': return first - second;
+                case '×': return first * second;
+                case '÷': return first / second;
+                default: return second;
+            }
+        }
+
+        // Timer functionality
+        let timerSeconds = 0;
+        let timerInterval = null;
+        let timerRunning = false;
+
+        function startTimer() {
+            if (!timerRunning) {
+                timerRunning = true;
+                timerInterval = setInterval(() => {
+                    timerSeconds++;
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        function pauseTimer() {
+            timerRunning = false;
+            if (timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+            }
+        }
+
+        function resetTimer() {
+            pauseTimer();
+            timerSeconds = 0;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const display = document.getElementById('timer-display');
+            if (display) {
+                const hours = Math.floor(timerSeconds / 3600);
+                const minutes = Math.floor((timerSeconds % 3600) / 60);
+                const seconds = timerSeconds % 60;
+                display.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        // Notepad functionality
+        function clearNotes() {
+            const notepad = document.getElementById('notepad-text');
+            if (notepad) {
+                notepad.value = '';
             }
         }
 
@@ -421,16 +596,66 @@
             setTimeout(() => {
                 loading.style.display = 'none';
                 
-                // Load the environmental intelligence interface
+                // Load environmental intelligence directly
                 moduleBay.innerHTML = `
-                    <iframe 
-                        src="environmental-intel.html" 
-                        style="width: 100%; height: 600px; border: none; border-radius: 10px;"
-                        title="Environmental Intelligence Module">
-                    </iframe>
+                    <div style="width: 100%; max-height: 600px; overflow-y: auto;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 10px;">
+                            <!-- Creek Panel -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌊</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Elkhorn Creek</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Flow Rate</span>
+                                    <span style="font-weight: bold; color: #00ff88;">125 cfs</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Gauge Height</span>
+                                    <span style="font-weight: bold; color: #00ff88;">3.2 ft</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Water Temp</span>
+                                    <span style="font-weight: bold; color: #00ff88;">68°F</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Weather Panel -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌤️</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Weather</span>
+                                </div>
+                                <div style="text-align: center; margin-bottom: 15px;">
+                                    <div style="font-size: 2.5em; font-weight: bold; color: #00c8ff; margin-bottom: 5px;">72°F</div>
+                                    <div style="font-size: 1em; text-transform: capitalize; opacity: 0.9;">Partly Cloudy</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8;">Humidity</span>
+                                    <span style="font-weight: bold; color: #00ff88;">65%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8;">Wind</span>
+                                    <span style="font-weight: bold; color: #00ff88;">5 mph SW</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Mission Status -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px; grid-column: span 2;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🎯</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Mission Status</span>
+                                </div>
+                                <div style="background: rgba(0, 50, 100, 0.3); border: 1px solid rgba(0, 150, 255, 0.4); border-radius: 8px; padding: 15px; text-align: center;">
+                                    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; color: #00ff88;">CONDITIONS: EXCELLENT</div>
+                                    <div style="opacity: 0.9;">All systems green! Creek levels optimal, weather ideal. Perfect for deployment.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 `;
                 moduleBay.style.display = 'flex';
-                moduleBay.style.height = '650px';
+                moduleBay.style.height = 'auto';
                 updateFooter('Environmental Intelligence Module deployed - Creek and weather analysis online');
             }, 2000);
         }
