@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Environmental Intelligence - USS Modular</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #0d1421 0%, #020408 100%);
+            color: #e0f6ff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .module-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            animation: moduleLoad 0.8s ease-out;
+        }
+
+        @keyframes moduleLoad {
+            0% { opacity: 0; transform: translateY(30px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel {
+            background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95));
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: rgba(0, 200, 255, 0.6);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 100, 200, 0.2);
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.6), transparent);
+            animation: scanline 4s infinite;
+        }
+
+        @keyframes scanline {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 150, 255, 0.3);
+        }
+
+        .panel-icon {
+            font-size: 1.5em;
+            margin-right: 10px;
+            color: #00c8ff;
+        }
+
+        .panel-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #00c8ff;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 150, 255, 0.1);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-value {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 5px rgba(0, 255, 136, 0.3);
+        }
+
+        .data-value.warning {
+            color: #ff8800;
+            text-shadow: 0 0 5px rgba(255, 136, 0, 0.3);
+        }
+
+        .data-value.danger {
+            color: #ff4444;
+            text-shadow: 0 0 5px rgba(255, 68, 68, 0.3);
+        }
+
+        .weather-current {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .temp-display {
+            font-size: 3em;
+            font-weight: bold;
+            color: #00c8ff;
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+            margin-bottom: 10px;
+        }
+
+        .weather-desc {
+            font-size: 1.2em;
+            text-transform: capitalize;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+
+        .forecast-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .forecast-item {
+            text-align: center;
+            padding: 10px;
+            background: rgba(0, 30, 60, 0.5);
+            border-radius: 5px;
+            border: 1px solid rgba(0, 100, 200, 0.3);
+        }
+
+        .forecast-day {
+            font-size: 0.8em;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .forecast-temp {
+            font-weight: bold;
+            color: #00ff88;
+        }
+
+        .moon-phase {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .moon-icon {
+            font-size: 4em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px 20px;
+            opacity: 0.6;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(0, 200, 255, 0.3);
+            border-top: 2px solid #00c8ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        .status-good { background: #00ff88; }
+        .status-caution { background: #ff8800; }
+        .status-poor { background: #ff4444; }
+
+        .last-updated {
+            font-size: 0.7em;
+            opacity: 0.6;
+            text-align: right;
+            margin-top: 15px;
+            font-style: italic;
+        }
+
+        .action-button {
+            display: inline-block;
+            padding: 8px 15px;
+            background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9));
+            border: 1px solid rgba(0, 100, 200, 0.4);
+            color: #e0f6ff;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            margin-top: 10px;
+        }
+
+        .action-button:hover {
+            background: linear-gradient(145deg, rgba(0, 60, 120, 0.9), rgba(0, 30, 60, 1));
+            border-color: rgba(0, 150, 255, 0.8);
+            transform: translateY(-1px);
+        }
+
+        .conditions-summary {
+            background: rgba(0, 50, 100, 0.3);
+            border: 1px solid rgba(0, 150, 255, 0.4);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .conditions-verdict {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .conditions-verdict.excellent { color: #00ff88; }
+        .conditions-verdict.good { color: #00c8ff; }
+        .conditions-verdict.fair { color: #ff8800; }
+        .conditions-verdict.poor { color: #ff4444; }
+
+        @media (max-width: 768px) {
+            .module-container {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .panel {
+                padding: 15px;
+            }
+            
+            .temp-display {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="module-container">
+        <!-- Creek Conditions Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-icon">🌊</span>
+                <span class="panel-title">Elkhorn Creek</span>
+            </div>
+            
+            <div id="creek-data" class="loading">
+                <div class="spinner"></div>
+                <div>Scanning creek conditions...</div>
+            </div>
+        </div>
+
+        <!-- Weather Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-icon">🌤️</span>
+                <span class="panel-title">Weather</span>
+            </div>
+            
+            <div id="weather-data" class="loading">
+                <div class="spinner"></div>
+                <div>Analyzing atmospheric conditions...</div>
+            </div>
+        </div>
+
+        <!-- Almanac Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-icon">🌙</span>
+                <span class="panel-title">Almanac</span>
+            </div>
+            
+            <div id="almanac-data">
+                <div class="moon-phase">
+                    <span class="moon-icon" id="moon-icon">🌕</span>
+                    <div><strong id="moon-phase-name">Full Moon</strong></div>
+                    <div style="font-size: 0.9em; opacity: 0.8; margin-top: 5px;" id="moon-illumination">100% Illuminated</div>
+                </div>
+                
+                <div class="data-row">
+                    <span class="data-label">Sunrise</span>
+                    <span class="data-value" id="sunrise">6:23 AM</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Sunset</span>
+                    <span class="data-value" id="sunset">7:45 PM</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Best Fishing</span>
+                    <span class="data-value" id="fishing-time">Dawn & Dusk</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mission Summary Panel -->
+        <div class="panel">
+            <div class="panel-header">
+                <span class="panel-icon">🎯</span>
+                <span class="panel-title">Mission Status</span>
+            </div>
+            
+            <div class="conditions-summary">
+                <div class="conditions-verdict good" id="mission-verdict">Conditions: GOOD</div>
+                <div id="mission-summary">Creek levels optimal, weather favorable. Recommend morning deployment.</div>
+                <a href="#" class="action-button" onclick="refreshAllData()">🔄 Refresh Intel</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock data - In production, these would be real API calls
+        const mockCreekData = {
+            flowRate: "125 cfs",
+            gaugeHeight: "3.2 ft",
+            waterTemp: "68°F",
+            status: "optimal",
+            trend: "stable",
+            lastReading: "2 minutes ago"
+        };
+
+        const mockWeatherData = {
+            current: {
+                temp: 72,
+                condition: "partly cloudy",
+                humidity: 65,
+                windSpeed: "5 mph",
+                windDir: "SW",
+                pressure: "30.15 in"
+            },
+            forecast: [
+                { day: "Today", high: 75, low: 62, condition: "⛅" },
+                { day: "Tomorrow", high: 78, low: 65, condition: "☀️" },
+                { day: "Wed", high: 73, low: 59, condition: "🌧️" },
+                { day: "Thu", high: 71, low: 57, condition: "⛅" }
+            ]
+        };
+
+        function loadCreekData() {
+            setTimeout(() => {
+                const container = document.getElementById('creek-data');
+                const status = mockCreekData.status === 'optimal' ? 'good' : 
+                              mockCreekData.status === 'high' ? 'caution' : 'poor';
+                
+                container.innerHTML = `
+                    <div class="data-row">
+                        <span class="data-label">Flow Rate</span>
+                        <span class="data-value">
+                            <span class="status-indicator status-${status}"></span>
+                            ${mockCreekData.flowRate}
+                        </span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Gauge Height</span>
+                        <span class="data-value">${mockCreekData.gaugeHeight}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Water Temp</span>
+                        <span class="data-value">${mockCreekData.waterTemp}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Trend</span>
+                        <span class="data-value">${mockCreekData.trend}</span>
+                    </div>
+                    <div class="last-updated">Last reading: ${mockCreekData.lastReading}</div>
+                `;
+            }, 1500);
+        }
+
+        function loadWeatherData() {
+            setTimeout(() => {
+                const container = document.getElementById('weather-data');
+                container.innerHTML = `
+                    <div class="weather-current">
+                        <div class="temp-display">${mockWeatherData.current.temp}°F</div>
+                        <div class="weather-desc">${mockWeatherData.current.condition}</div>
+                    </div>
+                    
+                    <div class="data-row">
+                        <span class="data-label">Humidity</span>
+                        <span class="data-value">${mockWeatherData.current.humidity}%</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Wind</span>
+                        <span class="data-value">${mockWeatherData.current.windSpeed} ${mockWeatherData.current.windDir}</span>
+                    </div>
+                    <div class="data-row">
+                        <span class="data-label">Pressure</span>
+                        <span class="data-value">${mockWeatherData.current.pressure}</span>
+                    </div>
+                    
+                    <div class="forecast-grid">
+                        ${mockWeatherData.forecast.map(day => `
+                            <div class="forecast-item">
+                                <div class="forecast-day">${day.day}</div>
+                                <div style="font-size: 1.5em; margin: 5px 0;">${day.condition}</div>
+                                <div class="forecast-temp">${day.high}°/${day.low}°</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }, 2000);
+        }
+
+        function updateAlmanacData() {
+            const now = new Date();
+            const sunrise = new Date(now);
+            sunrise.setHours(6, 23, 0);
+            const sunset = new Date(now);
+            sunset.setHours(19, 45, 0);
+            
+            // Calculate moon phase (simplified)
+            const moonPhases = [
+                { icon: '🌑', name: 'New Moon', illumination: '0%' },
+                { icon: '🌒', name: 'Waxing Crescent', illumination: '25%' },
+                { icon: '🌓', name: 'First Quarter', illumination: '50%' },
+                { icon: '🌔', name: 'Waxing Gibbous', illumination: '75%' },
+                { icon: '🌕', name: 'Full Moon', illumination: '100%' },
+                { icon: '🌖', name: 'Waning Gibbous', illumination: '75%' },
+                { icon: '🌗', name: 'Last Quarter', illumination: '50%' },
+                { icon: '🌘', name: 'Waning Crescent', illumination: '25%' }
+            ];
+            
+            const currentPhase = moonPhases[Math.floor(Math.random() * moonPhases.length)];
+            
+            document.getElementById('moon-icon').textContent = currentPhase.icon;
+            document.getElementById('moon-phase-name').textContent = currentPhase.name;
+            document.getElementById('moon-illumination').textContent = currentPhase.illumination + ' Illuminated';
+            document.getElementById('sunrise').textContent = sunrise.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            document.getElementById('sunset').textContent = sunset.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        }
+
+        function updateMissionStatus() {
+            // Simple logic to determine overall conditions
+            const creekGood = mockCreekData.status === 'optimal';
+            const weatherGood = mockWeatherData.current.temp > 60 && mockWeatherData.current.temp < 85;
+            
+            let verdict, summary, verdictClass;
+            
+            if (creekGood && weatherGood) {
+                verdict = "CONDITIONS: EXCELLENT";
+                summary = "All systems green! Perfect for fishing and kayaking. Creek levels optimal, weather ideal.";
+                verdictClass = "excellent";
+            } else if (creekGood || weatherGood) {
+                verdict = "CONDITIONS: GOOD";
+                summary = "Favorable conditions detected. Some parameters optimal. Recommend deployment with standard precautions.";
+                verdictClass = "good";
+            } else {
+                verdict = "CONDITIONS: FAIR";
+                summary = "Mixed conditions. Proceed with caution and monitor for changes.";
+                verdictClass = "fair";
+            }
+            
+            document.getElementById('mission-verdict').textContent = verdict;
+            document.getElementById('mission-verdict').className = `conditions-verdict ${verdictClass}`;
+            document.getElementById('mission-summary').textContent = summary;
+        }
+
+        function refreshAllData() {
+            // Show loading states
+            document.getElementById('creek-data').innerHTML = '<div class="spinner"></div><div>Refreshing creek data...</div>';
+            document.getElementById('weather-data').innerHTML = '<div class="spinner"></div><div>Updating weather intel...</div>';
+            
+            // Reload all data
+            loadCreekData();
+            loadWeatherData();
+            updateAlmanacData();
+            
+            setTimeout(() => {
+                updateMissionStatus();
+            }, 2500);
+        }
+
+        // Initialize module
+        loadCreekData();
+        loadWeatherData();
+        updateAlmanacData();
+        setTimeout(updateMissionStatus, 3000);
+
+        // Auto-refresh every 5 minutes
+        setInterval(() => {
+            refreshAllData();
+        }, 300000);
+    </script>
+</body>
+</html>

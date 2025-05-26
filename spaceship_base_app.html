@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Command Interface - USS Modular</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(ellipse at center, #0d1421 0%, #020408 100%);
+            color: #e0f6ff;
+            overflow: hidden;
+            height: 100vh;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .star {
+            position: absolute;
+            background: #ffffff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .cockpit {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "header header header"
+                "nav-left main nav-right"
+                "footer footer footer";
+            grid-template-rows: 60px 1fr 50px;
+            grid-template-columns: 250px 1fr 250px;
+            gap: 1px;
+            background: rgba(0, 15, 30, 0.1);
+        }
+
+        .panel {
+            background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95));
+            border: 1px solid rgba(0, 150, 255, 0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.6), transparent);
+            animation: scanline 3s infinite;
+        }
+
+        @keyframes scanline {
+            0%, 100% { transform: translateX(-100%); }
+            50% { transform: translateX(100%); }
+        }
+
+        .header {
+            grid-area: header;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .ship-name {
+            font-size: 1.2em;
+            color: #00c8ff;
+            text-shadow: 0 0 10px rgba(0, 200, 255, 0.5);
+        }
+
+        .status-indicators {
+            display: flex;
+            gap: 15px;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-light.green { background: #00ff88; box-shadow: 0 0 10px rgba(0, 255, 136, 0.7); }
+        .status-light.blue { background: #0088ff; box-shadow: 0 0 10px rgba(0, 136, 255, 0.7); }
+        .status-light.orange { background: #ff8800; box-shadow: 0 0 10px rgba(255, 136, 0, 0.7); }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        .nav-left {
+            grid-area: nav-left;
+            padding: 20px;
+        }
+
+        .nav-right {
+            grid-area: nav-right;
+            padding: 20px;
+        }
+
+        .main-view {
+            grid-area: main;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .module-bay {
+            width: 100%;
+            max-width: 600px;
+            min-height: 300px;
+            background: linear-gradient(145deg, rgba(0, 50, 100, 0.2), rgba(0, 20, 50, 0.4));
+            border: 2px dashed rgba(0, 150, 255, 0.4);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .module-bay:hover {
+            border-color: rgba(0, 200, 255, 0.8);
+            background: linear-gradient(145deg, rgba(0, 70, 140, 0.3), rgba(0, 30, 70, 0.5));
+            transform: translateY(-2px);
+        }
+
+        .module-bay::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(0, 200, 255, 0.1) 0%, transparent 70%);
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .module-bay:hover::after {
+            width: 200%;
+            height: 200%;
+        }
+
+        .bay-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+
+        .module-bay:hover .bay-icon {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .bay-text {
+            font-size: 1.2em;
+            text-align: center;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .control-panel {
+            margin-bottom: 30px;
+        }
+
+        .control-title {
+            font-size: 0.9em;
+            color: #00c8ff;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(0, 200, 255, 0.3);
+            padding-bottom: 5px;
+        }
+
+        .control-button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9));
+            border: 1px solid rgba(0, 100, 200, 0.4);
+            color: #e0f6ff;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .control-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 200, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .control-button:hover::before {
+            left: 100%;
+        }
+
+        .control-button:hover {
+            background: linear-gradient(145deg, rgba(0, 60, 120, 0.9), rgba(0, 30, 60, 1));
+            border-color: rgba(0, 150, 255, 0.8);
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0, 100, 200, 0.3);
+        }
+
+        .footer {
+            grid-area: footer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .loading-module {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(0, 200, 255, 0.3);
+            border-top: 3px solid #00c8ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .cockpit {
+                grid-template-areas: 
+                    "header"
+                    "main"
+                    "footer";
+                grid-template-rows: 60px 1fr 50px;
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-left, .nav-right {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <div class="cockpit">
+        <header class="panel header">
+            <div class="ship-name">USS MODULAR</div>
+            <div class="status-indicators">
+                <div class="status-light green" title="Life Support"></div>
+                <div class="status-light blue" title="Navigation"></div>
+                <div class="status-light orange" title="Module Bay"></div>
+            </div>
+        </header>
+
+        <nav class="panel nav-left">
+            <div class="control-panel">
+                <div class="control-title">Navigation</div>
+                <a href="#" class="control-button" onclick="loadModule('dashboard')">Dashboard</a>
+                <a href="#" class="control-button" onclick="loadModule('modules')">Module Bay</a>
+                <a href="#" class="control-button" onclick="loadModule('settings')">Ship Config</a>
+            </div>
+            
+            <div class="control-panel">
+                <div class="control-title">Systems</div>
+                <a href="#" class="control-button" onclick="systemAction('scan')">Sensor Sweep</a>
+                <a href="#" class="control-button" onclick="systemAction('diagnostic')">Diagnostics</a>
+            </div>
+        </nav>
+
+        <main class="panel main-view">
+            <div class="module-bay" onclick="loadModule('new')">
+                <div class="bay-icon">⬢</div>
+                <div class="bay-text">Load Module</div>
+            </div>
+            
+            <div class="loading-module" id="loading">
+                <div class="spinner"></div>
+                <div>Initializing Module...</div>
+            </div>
+        </main>
+
+        <nav class="panel nav-right">
+            <div class="control-panel">
+                <div class="control-title">Quick Deploy</div>
+                <a href="#" class="control-button" onclick="quickDeploy('environmental')">🌊 Creek Intel</a>
+                <a href="#" class="control-button" onclick="quickDeploy('calculator')">Calculator</a>
+                <a href="#" class="control-button" onclick="quickDeploy('notepad')">Notepad</a>
+                <a href="#" class="control-button" onclick="quickDeploy('timer')">Timer</a>
+            </div>
+            
+            <div class="control-panel">
+                <div class="control-title">Ship Status</div>
+                <div style="font-size: 0.8em; opacity: 0.8; margin-bottom: 10px;">
+                    <div>Power: 100%</div>
+                    <div>Modules: 0/∞</div>
+                    <div>Uptime: 00:00:01</div>
+                </div>
+            </div>
+        </nav>
+
+        <footer class="panel footer">
+            Ready for Module Deployment
+        </footer>
+    </div>
+
+    <script>
+        // Create starfield
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            const numStars = 100;
+            
+            for (let i = 0; i < numStars; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = star.style.height = (Math.random() * 3 + 1) + 'px';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Module loading simulation
+        function loadModule(moduleType) {
+            const moduleBay = document.querySelector('.module-bay');
+            const loading = document.getElementById('loading');
+            
+            moduleBay.style.display = 'none';
+            loading.style.display = 'block';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                moduleBay.style.display = 'flex';
+                moduleBay.innerHTML = `
+                    <div class="bay-icon">⚡</div>
+                    <div class="bay-text">Module "${moduleType}" Ready</div>
+                `;
+                updateFooter(`Module "${moduleType}" successfully deployed`);
+            }, 2000);
+        }
+
+        function quickDeploy(module) {
+            if (module === 'environmental') {
+                loadEnvironmentalModule();
+            } else {
+                loadModule(module);
+            }
+        }
+
+        function loadEnvironmentalModule() {
+            const moduleBay = document.querySelector('.module-bay');
+            const loading = document.getElementById('loading');
+            
+            moduleBay.style.display = 'none';
+            loading.style.display = 'block';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                
+                // Load the environmental intelligence interface
+                moduleBay.innerHTML = `
+                    <iframe 
+                        src="environmental-intel.html" 
+                        style="width: 100%; height: 600px; border: none; border-radius: 10px;"
+                        title="Environmental Intelligence Module">
+                    </iframe>
+                `;
+                moduleBay.style.display = 'flex';
+                moduleBay.style.height = '650px';
+                updateFooter('Environmental Intelligence Module deployed - Creek and weather analysis online');
+            }, 2000);
+        }
+
+        function systemAction(action) {
+            updateFooter(`Executing ${action}...`);
+            setTimeout(() => {
+                updateFooter(`${action} complete - All systems nominal`);
+            }, 1500);
+        }
+
+        function updateFooter(message) {
+            document.querySelector('.footer').textContent = message;
+        }
+
+        // Initialize uptime counter
+        let startTime = Date.now();
+        setInterval(() => {
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const hours = Math.floor(elapsed / 3600).toString().padStart(2, '0');
+            const minutes = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            
+            // Find the status div by looking for the one containing ship status info
+            const rightPanel = document.querySelector('.nav-right');
+            const statusDivs = rightPanel.querySelectorAll('div');
+            
+            statusDivs.forEach(div => {
+                if (div.textContent.includes('Power:')) {
+                    div.innerHTML = `
+                        <div>Power: 100%</div>
+                        <div>Modules: 0/∞</div>
+                        <div>Uptime: ${hours}:${minutes}:${seconds}</div>
+                    `;
+                }
+            });
+        }, 1000);
+
+        // Initialize
+        createStars();
+        
+        // Add some interactive polish
+        document.addEventListener('mousemove', (e) => {
+            const panels = document.querySelectorAll('.panel');
+            const mouseX = e.clientX / window.innerWidth;
+            const mouseY = e.clientY / window.innerHeight;
+            
+            panels.forEach(panel => {
+                const rect = panel.getBoundingClientRect();
+                const panelX = (rect.left + rect.width / 2) / window.innerWidth;
+                const panelY = (rect.top + rect.height / 2) / window.innerHeight;
+                
+                const deltaX = (mouseX - panelX) * 10;
+                const deltaY = (mouseY - panelY) * 5;
+                
+                panel.style.transform = `perspective(1000px) rotateY(${deltaX}deg) rotateX(${-deltaY}deg)`;
+            });
+        });
+    </script>
+</body>
+</html>
