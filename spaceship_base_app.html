@@ -717,8 +717,91 @@
         window.systemAction = systemAction;
         window.loadModule = loadModule;
 
+        function loadEnvironmentalModule() {
+            console.log('loadEnvironmentalModule called'); // Debug log
+            const moduleBay = document.querySelector('.module-bay');
+            const loading = document.getElementById('loading');
+            
+            if (!moduleBay || !loading) {
+                console.error('Required elements not found');
+                return;
+            }
+            
+            moduleBay.style.display = 'none';
+            loading.style.display = 'block';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                
+                // Load environmental intelligence with sample data
+                moduleBay.innerHTML = `
+                    <div style="width: 100%; max-height: 600px; overflow-y: auto;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 10px;">
+                            <!-- Creek Panel -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌊</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Elkhorn Creek</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Flow Rate</span>
+                                    <span style="font-weight: bold; color: #00ff88;">125 cfs</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Gauge Height</span>
+                                    <span style="font-weight: bold; color: #00ff88;">3.2 ft</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Water Temp</span>
+                                    <span style="font-weight: bold; color: #00ff88;">68°F</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Weather Panel -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌤️</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Weather</span>
+                                </div>
+                                <div style="text-align: center; margin-bottom: 15px;">
+                                    <div style="font-size: 2.5em; font-weight: bold; color: #00c8ff; margin-bottom: 5px;">72°F</div>
+                                    <div style="font-size: 1em; text-transform: capitalize; opacity: 0.9;">Partly Cloudy</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8;">Humidity</span>
+                                    <span style="font-weight: bold; color: #00ff88;">65%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8;">Wind</span>
+                                    <span style="font-weight: bold; color: #00ff88;">5 mph SW</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Mission Status -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px; grid-column: 1 / -1;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🎯</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Mission Status</span>
+                                </div>
+                                <div style="background: rgba(0, 50, 100, 0.3); border: 1px solid rgba(0, 150, 255, 0.4); border-radius: 8px; padding: 15px; text-align: center;">
+                                    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; color: #00ff88;">CONDITIONS: EXCELLENT</div>
+                                    <div style="opacity: 0.9;">All systems green! Creek levels optimal, weather ideal. Perfect for deployment.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                moduleBay.style.display = 'flex';
+                moduleBay.style.height = 'auto';
+                updateFooter('Environmental Intelligence Module deployed - Creek and weather analysis online');
+            }, 2000);
+        }
+
         function updateFooter(message) {
-            document.querySelector('.footer').textContent = message;
+            const footer = document.querySelector('.footer');
+            if (footer) {
+                footer.textContent = message;
+            }
         }
 
         // Initialize uptime counter
