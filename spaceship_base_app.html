@@ -1,4 +1,36 @@
-<!DOCTYPE html>
+function loadTimerModule() {
+            const moduleBay = document.querySelector('.module-bay');
+            
+            if (!moduleBay) {
+                console.error('Module bay not found');
+                return;
+            }
+            
+            // Remove onclick and change cursor
+            moduleBay.removeAttribute('onclick');
+            moduleBay.style.cursor = 'default';
+            
+            moduleBay.innerHTML = `
+                <div style="width: 100%; max-width: 400px; background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 20px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                        <span style="font-size: 1.5em; margin-right: 10px; color: #00c8ff;">⏱️</span>
+                        <span style="font-size: 1.2em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Mission Timer</span>
+                    </div>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <div style="font-size: 3em; font-weight: bold; color: #00ff88; margin-bottom: 10px;" id="timer-display">00:00:00</div>
+                        <div style="display: flex; gap: 10px; justify-content: center; margin-bottom: 20px;">
+                            <button onclick="startTimer()" style="padding: 10px 20px; background: linear-gradient(145deg, rgba(0, 100, 0, 0.8), rgba(0, 60, 0, 0.9)); border: 1px solid rgba(0, 200, 0, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer;">Start</button>
+                            <button onclick="pauseTimer()" style="padding: 10px 20px; background: linear-gradient(145deg, rgba(100, 100, 0, 0.8), rgba(60, 60, 0, 0.9)); border: 1px solid rgba(200, 200, 0, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer;">Pause</button>
+                            <button onclick="resetTimer()" style="padding: 10px 20px; background: linear-gradient(145deg, rgba(100, 0, 0, 0.8), rgba(60, 0, 0, 0.9)); border: 1px solid rgba(200, 0, 0, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer;">Reset</button>
+                        </div>
+                        <button onclick="resetModuleBay()" style="padding: 8px 15px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">🔄 Reset Module Bay</button>
+                    </div>
+                </div>
+            `;
+            moduleBay.style.display = 'flex';
+            moduleBay.style.height = 'auto';
+            updateFooter('Timer Module deployed - Chronometer systems online');
+        }<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -432,6 +464,16 @@
 
         function loadCalculatorModule() {
             const moduleBay = document.querySelector('.module-bay');
+            
+            if (!moduleBay) {
+                console.error('Module bay not found');
+                return;
+            }
+            
+            // Remove onclick and change cursor
+            moduleBay.removeAttribute('onclick');
+            moduleBay.style.cursor = 'default';
+            
             moduleBay.innerHTML = `
                 <div style="width: 100%; max-width: 400px; background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 20px;">
                     <div style="display: flex; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
@@ -439,8 +481,11 @@
                         <span style="font-size: 1.2em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Calculator</span>
                     </div>
                     <div style="background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 5px; margin-bottom: 15px; text-align: right; font-size: 2em; color: #00ff88; min-height: 60px; display: flex; align-items: center; justify-content: flex-end;" id="calc-display">0</div>
-                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px;">
                         ${createCalculatorButtons()}
+                    </div>
+                    <div style="text-align: center;">
+                        <button onclick="resetModuleBay()" style="padding: 8px 15px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">🔄 Reset Module Bay</button>
                     </div>
                 </div>
             `;
@@ -469,6 +514,16 @@
 
         function loadNotepadModule() {
             const moduleBay = document.querySelector('.module-bay');
+            
+            if (!moduleBay) {
+                console.error('Module bay not found');
+                return;
+            }
+            
+            // Remove onclick and change cursor
+            moduleBay.removeAttribute('onclick');
+            moduleBay.style.cursor = 'default';
+            
             moduleBay.innerHTML = `
                 <div style="width: 100%; max-width: 600px; background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 20px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
@@ -479,7 +534,10 @@
                         <button onclick="clearNotes()" style="padding: 5px 10px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 3px; font-size: 0.8em; cursor: pointer;">Clear</button>
                     </div>
                     <textarea id="notepad-text" style="width: 100%; height: 300px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 5px; padding: 15px; color: #e0f6ff; font-family: 'Courier New', monospace; font-size: 14px; resize: vertical;" placeholder="Enter mission notes..."></textarea>
-                    <div style="margin-top: 10px; font-size: 0.8em; opacity: 0.6; text-align: right;">Auto-saved locally</div>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+                        <div style="font-size: 0.8em; opacity: 0.6;">Auto-saved locally</div>
+                        <button onclick="resetModuleBay()" style="padding: 8px 15px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">🔄 Reset Module Bay</button>
+                    </div>
                 </div>
             `;
             moduleBay.style.display = 'flex';
@@ -727,6 +785,10 @@
                 return;
             }
             
+            // Remove the onclick event to prevent interference with content interaction
+            moduleBay.removeAttribute('onclick');
+            moduleBay.style.cursor = 'default';
+            
             moduleBay.style.display = 'none';
             loading.style.display = 'block';
             
@@ -735,8 +797,8 @@
                 
                 // Load environmental intelligence with sample data
                 moduleBay.innerHTML = `
-                    <div style="width: 100%; max-height: 600px; overflow-y: auto;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 10px;">
+                    <div style="width: 100%; max-height: 600px; overflow-y: auto; padding: 10px;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
                             <!-- Creek Panel -->
                             <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
@@ -788,6 +850,11 @@
                                     <div style="opacity: 0.9;">All systems green! Creek levels optimal, weather ideal. Perfect for deployment.</div>
                                 </div>
                             </div>
+                        </div>
+                        
+                        <!-- Reset Button -->
+                        <div style="text-align: center; margin-top: 20px;">
+                            <button onclick="resetModuleBay()" style="padding: 10px 20px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 5px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px;">🔄 Reset Module Bay</button>
                         </div>
                     </div>
                 `;
