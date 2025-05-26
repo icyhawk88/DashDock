@@ -215,6 +215,11 @@
         .status-caution { background: #ff8800; }
         .status-poor { background: #ff4444; }
 
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
         .last-updated {
             font-size: 0.7em;
             opacity: 0.6;
@@ -236,6 +241,7 @@
             letter-spacing: 0.5px;
             transition: all 0.2s ease;
             margin-top: 10px;
+            cursor: pointer;
         }
 
         .action-button:hover {
@@ -349,7 +355,7 @@
             <div class="conditions-summary">
                 <div class="conditions-verdict good" id="mission-verdict">Conditions: GOOD</div>
                 <div id="mission-summary">Creek levels optimal, weather favorable. Recommend morning deployment.</div>
-                <a href="#" class="action-button" onclick="refreshAllData()">🔄 Refresh Intel</a>
+                <div class="action-button" onclick="refreshAllData()">🔄 Refresh Intel</div>
             </div>
         </div>
     </div>
@@ -473,6 +479,84 @@
                         { day: "Thu", high: 71, low: 57, condition: "⛅" }
                     ]
                 };
+            }
+        }
+
+        // Fixed: Added missing functions
+        async function loadCreekData() {
+            await fetchCreekData();
+            
+            document.getElementById('creek-data').innerHTML = `
+                <div class="data-row">
+                    <span class="data-label">Flow Rate</span>
+                    <span class="data-value ${getStatusClass(liveCreekData.status)}">${liveCreekData.flowRate}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Gauge Height</span>
+                    <span class="data-value">${liveCreekData.gaugeHeight}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Water Temp</span>
+                    <span class="data-value">${liveCreekData.waterTemp}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Status</span>
+                    <span class="data-value ${getStatusClass(liveCreekData.status)}">
+                        <span class="status-indicator status-${getStatusIndicator(liveCreekData.status)}"></span>
+                        ${liveCreekData.status.toUpperCase()}
+                    </span>
+                </div>
+                <div class="last-updated">Last reading: ${liveCreekData.lastReading}</div>
+            `;
+        }
+
+        async function loadWeatherData() {
+            await fetchWeatherData();
+            
+            document.getElementById('weather-data').innerHTML = `
+                <div class="weather-current">
+                    <div class="temp-display">${liveWeatherData.current.temp}°F</div>
+                    <div class="weather-desc">${liveWeatherData.current.condition}</div>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Humidity</span>
+                    <span class="data-value">${liveWeatherData.current.humidity}%</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Wind</span>
+                    <span class="data-value">${liveWeatherData.current.windSpeed} ${liveWeatherData.current.windDir}</span>
+                </div>
+                <div class="data-row">
+                    <span class="data-label">Pressure</span>
+                    <span class="data-value">${liveWeatherData.current.pressure}</span>
+                </div>
+                <div class="forecast-grid">
+                    ${liveWeatherData.forecast.map(day => `
+                        <div class="forecast-item">
+                            <div class="forecast-day">${day.day}</div>
+                            <div style="font-size: 1.5em; margin: 5px 0;">${day.condition}</div>
+                            <div class="forecast-temp">${day.high}°/${day.low}°</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'optimal': return '';
+                case 'high': case 'low': return 'warning';
+                case 'extreme': return 'danger';
+                default: return '';
+            }
+        }
+
+        function getStatusIndicator(status) {
+            switch(status) {
+                case 'optimal': return 'good';
+                case 'high': case 'low': return 'caution';
+                case 'extreme': return 'poor';
+                default: return 'caution';
             }
         }
 
