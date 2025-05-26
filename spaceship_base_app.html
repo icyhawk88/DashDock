@@ -228,6 +228,7 @@
             letter-spacing: 0.5px;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
 
         .control-button::before {
@@ -319,15 +320,15 @@
         <nav class="panel nav-left">
             <div class="control-panel">
                 <div class="control-title">Navigation</div>
-                <a href="#" class="control-button" onclick="loadModule('dashboard')">Dashboard</a>
-                <a href="#" class="control-button" onclick="loadModule('modules')">Module Bay</a>
-                <a href="#" class="control-button" onclick="loadModule('settings')">Ship Config</a>
+                <div class="control-button" onclick="loadModule('dashboard')">Dashboard</div>
+                <div class="control-button" onclick="loadModule('modules')">Module Bay</div>
+                <div class="control-button" onclick="loadModule('settings')">Ship Config</div>
             </div>
             
             <div class="control-panel">
                 <div class="control-title">Systems</div>
-                <a href="#" class="control-button" onclick="systemAction('scan')">Sensor Sweep</a>
-                <a href="#" class="control-button" onclick="systemAction('diagnostic')">Diagnostics</a>
+                <div class="control-button" onclick="systemAction('scan')">Sensor Sweep</div>
+                <div class="control-button" onclick="systemAction('diagnostic')">Diagnostics</div>
             </div>
         </nav>
 
@@ -346,15 +347,15 @@
         <nav class="panel nav-right">
             <div class="control-panel">
                 <div class="control-title">Quick Deploy</div>
-                <a href="#" class="control-button" onclick="quickDeploy('environmental')">🌊 Creek Intel</a>
-                <a href="#" class="control-button" onclick="quickDeploy('calculator')">Calculator</a>
-                <a href="#" class="control-button" onclick="quickDeploy('notepad')">Notepad</a>
-                <a href="#" class="control-button" onclick="quickDeploy('timer')">Timer</a>
+                <div class="control-button" onclick="quickDeploy('environmental')">🌊 Creek Intel</div>
+                <div class="control-button" onclick="quickDeploy('calculator')">Calculator</div>
+                <div class="control-button" onclick="quickDeploy('notepad')">Notepad</div>
+                <div class="control-button" onclick="quickDeploy('timer')">Timer</div>
             </div>
             
             <div class="control-panel">
                 <div class="control-title">Ship Status</div>
-                <div style="font-size: 0.8em; opacity: 0.8; margin-bottom: 10px;">
+                <div id="ship-status" style="font-size: 0.8em; opacity: 0.8; margin-bottom: 10px;">
                     <div>Power: 100%</div>
                     <div>Modules: 0/∞</div>
                     <div>Uptime: 00:00:01</div>
@@ -381,6 +382,15 @@
                 star.style.width = star.style.height = (Math.random() * 3 + 1) + 'px';
                 star.style.animationDelay = Math.random() * 3 + 's';
                 starsContainer.appendChild(star);
+            }
+        }
+
+        // Fixed quickDeploy function
+        function quickDeploy(moduleType) {
+            if (moduleType === 'environmental') {
+                loadEnvironmentalModule();
+            } else {
+                loadModule(moduleType);
             }
         }
 
@@ -423,18 +433,31 @@
                     </div>
                     <div style="background: rgba(0, 0, 0, 0.5); padding: 15px; border-radius: 5px; margin-bottom: 15px; text-align: right; font-size: 2em; color: #00ff88; min-height: 60px; display: flex; align-items: center; justify-content: flex-end;" id="calc-display">0</div>
                     <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
-                        ${['C', '±', '%', '÷', '7', '8', '9', '×', '4', '5', '6', '-', '1', '2', '3', '+', '0', '.', '='].map(btn => 
-                            `<button style="padding: 15px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: all 0.2s ease;" 
-                            onmouseover="this.style.background='linear-gradient(145deg, rgba(0, 60, 120, 0.9), rgba(0, 30, 60, 1))'" 
-                            onmouseout="this.style.background='linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9))'"
-                            onclick="calcInput('${btn}')">${btn === '0' ? '<span style=\\"grid-column: span 2;\\">' + btn + '</span>' : btn}</button>`
-                        ).join('')}
+                        ${createCalculatorButtons()}
                     </div>
                 </div>
             `;
             moduleBay.style.display = 'flex';
             moduleBay.style.height = 'auto';
             updateFooter('Calculator Module deployed - Computational systems online');
+        }
+
+        function createCalculatorButtons() {
+            const buttons = ['C', '±', '%', '÷', '7', '8', '9', '×', '4', '5', '6', '-', '1', '2', '3', '+', '0', '0', '.', '=']; // Fixed: two '0' buttons for proper grid
+            return buttons.map((btn, index) => {
+                let buttonStyle = `padding: 15px; background: linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9)); border: 1px solid rgba(0, 100, 200, 0.4); color: #e0f6ff; border-radius: 5px; font-size: 1.2em; cursor: pointer; transition: all 0.2s ease;`;
+                
+                // Make the first '0' button span 2 columns
+                if (index === 16) {
+                    buttonStyle += ' grid-column: span 2;';
+                    return `<button style="${buttonStyle}" onmouseover="this.style.background='linear-gradient(145deg, rgba(0, 60, 120, 0.9), rgba(0, 30, 60, 1))'" onmouseout="this.style.background='linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9))'" onclick="calcInput('${btn}')">${btn}</button>`;
+                } else if (index === 17) {
+                    // Skip the second '0' button
+                    return '';
+                }
+                
+                return `<button style="${buttonStyle}" onmouseover="this.style.background='linear-gradient(145deg, rgba(0, 60, 120, 0.9), rgba(0, 30, 60, 1))'" onmouseout="this.style.background='linear-gradient(145deg, rgba(0, 40, 80, 0.8), rgba(0, 20, 40, 0.9))'" onclick="calcInput('${btn}')">${btn}</button>`;
+            }).join('');
         }
 
         function loadNotepadModule() {
@@ -480,6 +503,80 @@
             updateFooter('Timer Module deployed - Chronometer systems online');
         }
 
+        function loadEnvironmentalModule() {
+            const moduleBay = document.querySelector('.module-bay');
+            const loading = document.getElementById('loading');
+            
+            moduleBay.style.display = 'none';
+            loading.style.display = 'block';
+            
+            setTimeout(() => {
+                loading.style.display = 'none';
+                
+                // Load environmental intelligence with sample data
+                moduleBay.innerHTML = `
+                    <div style="width: 100%; max-height: 600px; overflow-y: auto;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 10px;">
+                            <!-- Creek Panel -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌊</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Elkhorn Creek</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Flow Rate</span>
+                                    <span style="font-weight: bold; color: #00ff88;">125 cfs</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Gauge Height</span>
+                                    <span style="font-weight: bold; color: #00ff88;">3.2 ft</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Water Temp</span>
+                                    <span style="font-weight: bold; color: #00ff88;">68°F</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Weather Panel -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌤️</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Weather</span>
+                                </div>
+                                <div style="text-align: center; margin-bottom: 15px;">
+                                    <div style="font-size: 2.5em; font-weight: bold; color: #00c8ff; margin-bottom: 5px;">72°F</div>
+                                    <div style="font-size: 1em; text-transform: capitalize; opacity: 0.9;">Partly Cloudy</div>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8;">Humidity</span>
+                                    <span style="font-weight: bold; color: #00ff88;">65%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
+                                    <span style="font-size: 0.8em; opacity: 0.8;">Wind</span>
+                                    <span style="font-weight: bold; color: #00ff88;">5 mph SW</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Mission Status -->
+                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px; grid-column: 1 / -1;">
+                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
+                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🎯</span>
+                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Mission Status</span>
+                                </div>
+                                <div style="background: rgba(0, 50, 100, 0.3); border: 1px solid rgba(0, 150, 255, 0.4); border-radius: 8px; padding: 15px; text-align: center;">
+                                    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; color: #00ff88;">CONDITIONS: EXCELLENT</div>
+                                    <div style="opacity: 0.9;">All systems green! Creek levels optimal, weather ideal. Perfect for deployment.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                moduleBay.style.display = 'flex';
+                moduleBay.style.height = 'auto';
+                updateFooter('Environmental Intelligence Module deployed - Creek and weather analysis online');
+            }, 2000);
+        }
+
         // Calculator functionality
         let calcDisplay = '0';
         let calcPrevious = null;
@@ -488,6 +585,7 @@
 
         function calcInput(input) {
             const display = document.getElementById('calc-display');
+            if (!display) return;
             
             if (input === 'C') {
                 calcDisplay = '0';
@@ -586,80 +684,6 @@
             }
         }
 
-        function loadEnvironmentalModule() {
-            const moduleBay = document.querySelector('.module-bay');
-            const loading = document.getElementById('loading');
-            
-            moduleBay.style.display = 'none';
-            loading.style.display = 'block';
-            
-            setTimeout(() => {
-                loading.style.display = 'none';
-                
-                // Load environmental intelligence directly
-                moduleBay.innerHTML = `
-                    <div style="width: 100%; max-height: 600px; overflow-y: auto;">
-                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px; padding: 10px;">
-                            <!-- Creek Panel -->
-                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
-                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
-                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌊</span>
-                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Elkhorn Creek</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
-                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Flow Rate</span>
-                                    <span style="font-weight: bold; color: #00ff88;">125 cfs</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(0, 150, 255, 0.1);">
-                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Gauge Height</span>
-                                    <span style="font-weight: bold; color: #00ff88;">3.2 ft</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 8px 0;">
-                                    <span style="font-size: 0.8em; opacity: 0.8; text-transform: uppercase;">Water Temp</span>
-                                    <span style="font-weight: bold; color: #00ff88;">68°F</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Weather Panel -->
-                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px;">
-                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
-                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🌤️</span>
-                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Weather</span>
-                                </div>
-                                <div style="text-align: center; margin-bottom: 15px;">
-                                    <div style="font-size: 2.5em; font-weight: bold; color: #00c8ff; margin-bottom: 5px;">72°F</div>
-                                    <div style="font-size: 1em; text-transform: capitalize; opacity: 0.9;">Partly Cloudy</div>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
-                                    <span style="font-size: 0.8em; opacity: 0.8;">Humidity</span>
-                                    <span style="font-weight: bold; color: #00ff88;">65%</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; padding: 6px 0;">
-                                    <span style="font-size: 0.8em; opacity: 0.8;">Wind</span>
-                                    <span style="font-weight: bold; color: #00ff88;">5 mph SW</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Mission Status -->
-                            <div style="background: linear-gradient(145deg, rgba(0, 20, 40, 0.9), rgba(0, 10, 25, 0.95)); border: 1px solid rgba(0, 150, 255, 0.3); border-radius: 10px; padding: 15px; grid-column: span 2;">
-                                <div style="display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid rgba(0, 150, 255, 0.3);">
-                                    <span style="font-size: 1.2em; margin-right: 8px; color: #00c8ff;">🎯</span>
-                                    <span style="font-size: 1em; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; color: #00c8ff;">Mission Status</span>
-                                </div>
-                                <div style="background: rgba(0, 50, 100, 0.3); border: 1px solid rgba(0, 150, 255, 0.4); border-radius: 8px; padding: 15px; text-align: center;">
-                                    <div style="font-size: 1.2em; font-weight: bold; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; color: #00ff88;">CONDITIONS: EXCELLENT</div>
-                                    <div style="opacity: 0.9;">All systems green! Creek levels optimal, weather ideal. Perfect for deployment.</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                moduleBay.style.display = 'flex';
-                moduleBay.style.height = 'auto';
-                updateFooter('Environmental Intelligence Module deployed - Creek and weather analysis online');
-            }, 2000);
-        }
-
         function systemAction(action) {
             updateFooter(`Executing ${action}...`);
             setTimeout(() => {
@@ -679,19 +703,14 @@
             const minutes = Math.floor((elapsed % 3600) / 60).toString().padStart(2, '0');
             const seconds = (elapsed % 60).toString().padStart(2, '0');
             
-            // Find the status div by looking for the one containing ship status info
-            const rightPanel = document.querySelector('.nav-right');
-            const statusDivs = rightPanel.querySelectorAll('div');
-            
-            statusDivs.forEach(div => {
-                if (div.textContent.includes('Power:')) {
-                    div.innerHTML = `
-                        <div>Power: 100%</div>
-                        <div>Modules: 0/∞</div>
-                        <div>Uptime: ${hours}:${minutes}:${seconds}</div>
-                    `;
-                }
-            });
+            const statusDiv = document.getElementById('ship-status');
+            if (statusDiv) {
+                statusDiv.innerHTML = `
+                    <div>Power: 100%</div>
+                    <div>Modules: 0/∞</div>
+                    <div>Uptime: ${hours}:${minutes}:${seconds}</div>
+                `;
+            }
         }, 1000);
 
         // Initialize
